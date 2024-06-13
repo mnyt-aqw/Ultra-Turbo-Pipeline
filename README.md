@@ -12,18 +12,46 @@ genes using RGI. The pipeline uses Nextflow for orchestration and
 supports Conda and Apptainer (Singularity) environments for software
 dependencies.
 
-## Features
+## How to run the pipeline
 
-- Converts fast5 files to pod5 format and splits reads by channel for
-  parallel processing.
-- Basecalls reads from each channel individually using Dorado.
-- Combines base-called reads and performs quality control using PycoQC
-  and Filtlong.
-- Assembles genomes with Flye and polishes assemblies with Medaka.
-- Assesses assembly quality with CheckM2 and BUSCO.
-- Screens for antimicrobial resistance genes (ARGs) and mobile genetic
-  elements (MGEs).
-- Performs taxonomic classification using GTDB-TK and MMSeqs2.
+### Build container
+
+Most containers for this pipeline are publicly available on various
+container repositories. There is however one that you should build
+locally. Go to the `Container` directory and execute this command
+`apptainer build apptainer.sif apptainer.def`.
+
+## Workflow
+
+1.  **Basecalling and Demultiplexing**
+    - **DORADO_BASECALL**: Converts raw Pod5 files to basecalled BAM
+      files.
+    - **DORADO_DEMULTIPLEX**: Splits the BAM files into barcoded reads
+      and provides a summary for quality control.
+2.  **Quality Control**
+    - **PYCOQC**: Generates quality control metrics from the basecalling
+      summary.
+    - **FILTLONG**: Filters and trims the reads to ensure high quality.
+3.  **Assembly and Polishing**
+    - **FLYE**: Assembles the filtered reads into contigs.
+    - **MEDAKA**: Polishes the assembly to correct errors.
+4.  **Assembly Quality Assessment**
+    - **CHECKM2_DATABASEDOWNLOAD**: Downloads the CheckM2 database.
+    - **CHECKM2**: Assesses the quality of the assembly.
+    - **BUSCO**: Evaluates the completeness of the assembly using
+      Benchmarking Universal Single-Copy Orthologs.
+5.  **Gene Screening**
+    - **PRODIGAL**: Predicts coding regions in the assembly.
+    - **DIAMOND_MAKEDB**: Creates a DIAMOND database (optional).
+    - **DIAMOND_BLASTP**: Screens for genes using the DIAMOND tool
+      (optional).
+    - **RGI**: Screens for antibiotic resistance genes.
+6.  **Taxonomic Classification**
+    - **GTDB_TK_MAKEDB**: Downloads and prepares the GTDB-Tk database.
+    - **GTDB_TK**: Classifies the assembly based on the GTDB-Tk
+      database.
+    - **MMSEQS2_MAKEDB**: Creates an MMseqs2 database.
+    - **MMSEQS2_CLASSIFY**: Classifies the assembly using MMseqs2.
 
 ## Pipeline Workflow
 
@@ -43,65 +71,55 @@ graph TD
     G --> M[Classify individual contigs with MMseqs2]
 ```
 
-## Configuration parameters
+## Parameters
 
-The pipeline can be configured using the following parameters in
-nextflow.config:
+The pipeline parameters are defined in the `config` file:
 
-- `params.reads`: Path to the input reads (fast5 or pod5 format).
-
-- `params.outdir`: Output directory for results.
-
-- `params.dorado`: Boolean flag to enable or disable Dorado basecalling.
-
-- `params.basecalled_reads`: Path to the basecalled reads.
-
-- `params.databases`: Path to the databases for Diamond in protein
-  format.
-
-- `params.clusterOptions`: Cluster options for SLURM or other
-  schedulers.
-
-- `params.storeDir`: Directory to store intermediate files.
-
-- `params.directory_out`: Directory to store final results.
-
-- `params.diamond_id`: Minimum identity threshold for Diamond.
-
-- `params.diamond_subject_cov`: Minimum subject coverage threshold for
-  Diamond.
-
-- `params.DORADO_model`: Choose between three models:  
+- `reads`: Path to input Pod5 files.
+- `databases`: Path to custom databases.
+- `clusterOptions`: Additional cluster options.
+- `storeDir`: Directory to store intermediate files.
+- `directory_out`: Directory for final output.
+- `diamond_id`: Minimum percent identity for DIAMOND BLASTP.
+  `Default 90 %`
+- `diamond_subject_cov`: Minimum subject coverage for DIAMOND BLASTP.
+  `Default 80 %`
+- `filtlong_min_lenght`: Minimum length of reads to keep. `Default 6000`
+- `filtlong_keep_percent`: Percent of the longest reads to keep.
+  `Default 90 %`
+- `DORADO_device`: Device for Dorado (e.g., “cpu”, “gpu”). GPU is much
+  faster and is therefore the preferred option if available.
+- `DORADO_kit`: Kit name for barcodes.
+- `DORADO_model`: Model for Dorado basecalling. This determines the
+  accuracy and time it takes. Choose between three models:  
   `fast`: fast and less accurate.  
   `hac`: slower and more accurate.  
   `sup`: Slow and most accurate.  
+- `GTDB_db`: URL for GTDB database. Default is downloading the latest
+  version.
+- `mmseq2_db`: Name of MMseqs2 database. Read about the different
+  options
+  [here](https://github.com/soedinglab/mmseqs2/wiki#downloading-databases).
 
-- `params.MEDAKA_model`: Medaka model to use for polishing.
-
-- `params.filtlong_min_lenght`: Minimum read length for Filtlong.
-
-- `params.filtlong_keep_percent`: Percentage of reads to keep for
-  Filtlong.
-
-- `params.DORADO_device`: Device to use for Dorado (e.g., CPU or GPU).
-
-- `params.DORADO_kit`: Kit used for Dorado basecalling.
+The assembly related defaults are based on the valued identified by the
+authors of [this](https://doi.org/10.1371/journal.pcbi.1010905) paper.
 
 ## Process Configuration
 
 The pipeline includes specific configurations for each process, such as
-CPU requirements, Conda environments, container images, and error
-handling strategies. For example:
+CPU requirements, container images, and error handling strategies. For
+example:
 
 ``` groovy
 process {
-    withName:CONV_fast5_POD5 {
-        cpus = 1 // Nr Cores
-        conda = ""
-        container = "quay.io/sangerpathogens/pod5:0.3.6" // Name of container
-        publishDir = "${params.directory_out}/Demultiplexed/" // Where output is published
-        maxRetries = 3 // Nr of times Nextflow will retry if the process fails
-        errorStrategy = { task.exitStatus in 137..140 ? 'retry' : 'terminate' }
+    withName:PRODIGAL {
+        cpus = 1 // nr CPUs
+        time = '1m' // max duration
+        container = "${projectDir}/Containers/apptainer.sif" // container
+        storeDir = "${params.storeDir}/Prodigal/" // where to store cache
+        publishDir = "${params.directory_out}/Prodigal/" // where to publish results
+        maxRetries = 3 // nr times it retried process if it fails
     }
+
 }
 ```

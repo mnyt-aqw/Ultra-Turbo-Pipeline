@@ -7,7 +7,7 @@ process FILTLONG {
     tuple val(sample), path(reads)
     
     output:
-    tuple val(sample), path("${sample}_trimmed.fastq.gz") , emit: reads
+    tuple val(sample), path("${sample}_trimmed.fq.gz") , emit: reads
     
     script:
     """
@@ -15,6 +15,6 @@ process FILTLONG {
     --min_length ${params.filtlong_min_lenght} \
     --keep_percent ${params.filtlong_keep_percent} \
     ${reads} \
-    | gzip > ${sample}_trimmed.fastq.gz
+    | gzip > ${sample}_trimmed.fq.gz
     """
 }

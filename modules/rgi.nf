@@ -4,13 +4,10 @@ process RGI {
     input:
     tuple val(sample), path(assembly)
 
-
     output:
     tuple val(sample), path("${sample}*.txt") , emit: tsv
 
     script:
-
-
     """
     rgi \\
         main \\

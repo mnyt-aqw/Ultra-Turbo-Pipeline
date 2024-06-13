@@ -8,7 +8,6 @@ process PYCOQC {
     path "summary.html", emit: html
     path "summary.json", emit: json
 
-
     script:
     """
     pycoQC \\

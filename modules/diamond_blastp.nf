@@ -9,14 +9,14 @@ process DIAMOND_BLASTP {
 
     script:
     """
-    diamond blastp \\
-    --db $database \\
-    --query $assembly \\
-    --out ${sample}_${db_name}_diamond.tsv \\
-    --outfmt 6 \\
-    -p $task.cpus \\
+    diamond blastp \
+    --db $database \
+    --query $assembly \
+    --out ${sample}_${db_name}_diamond.tsv \
+    --outfmt 6 \
+    -p $task.cpus \
     -k0 \\
-    --id ${params.diamond_id} \\
+    --id ${params.diamond_id} \
     --subject-cover ${params.diamond_subject_cov} 
     """
 }

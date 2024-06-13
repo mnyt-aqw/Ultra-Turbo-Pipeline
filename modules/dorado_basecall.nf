@@ -10,7 +10,7 @@ process DORADO_BASECALL {
     
     script:
     """
-    ${params.Dorado} basecaller \
+    dorado basecaller \
     ${params.DORADO_model} \
     ${reads} \
     --device ${params.DORADO_device} \

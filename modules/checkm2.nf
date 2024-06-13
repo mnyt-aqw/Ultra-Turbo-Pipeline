@@ -8,7 +8,6 @@ process CHECKM2 {
     output:
     path "quality_report.tsv" ,emit: checkm2_report
 
-
     script:
     """
     checkm2 \
