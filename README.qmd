@@ -15,6 +15,12 @@ This pipeline processes Nanopore sequencing files, assembles them, assesses the 
 
 Most containers for this pipeline are publicly available on various container repositories. There is however one that you should build locally. Go to the `Container` directory and execute this command `apptainer build apptainer.sif apptainer.def`.
 
+
+### Start pipeline
+
+To start the pipeline execute this line ``NXF_VER=24.04.2 nextflow run main.nf --profile {server or cluster} {other args}``. This will download a specific version of Nextflow and you will have to specify if you run the pipeline on a `server` or `cluster`. If yo want to resume the pipeline use the `-resume` flag. Then the pipeline will ignore processes it already have finished. 
+
+
 ## Workflow
 
 1. **Basecalling and Demultiplexing**
