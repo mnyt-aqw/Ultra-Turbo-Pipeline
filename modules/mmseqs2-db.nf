@@ -9,8 +9,6 @@ process MMSEQS2_MAKEDB {
     
     script:
     """
-    mmseqs databases $db_name  db tmp --threads ${task.cpus}
-   # mmseqs createtaxdb db tmp 
-    
+    mmseqs databases $db_name  db tmp --threads ${task.cpus}   
     """
 }

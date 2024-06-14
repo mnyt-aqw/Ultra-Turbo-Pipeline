@@ -43,55 +43,56 @@ include { MMSEQS2_CLASSIFY } from './modules/mmseqs2'
 
 // Main workflow
 workflow {
-
     Channel
         .fromFilePairs(params.reads, size: 1)
         .set { read_ch }
 
-      DORADO_BASECALL(read_ch)
+    // Run basecalling
+    if (params.run_basecalling) {
+        DORADO_BASECALL(read_ch)
+        DORADO_DEMULTIPLEX(DORADO_BASECALL.out.bam.map { it[1] }.collect())
+        barcoded_reads_ch = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
+            .map { file -> [file.baseName, file] }
+        PYCOQC(DORADO_DEMULTIPLEX.out.summary)
+    } else {
+        barcoded_reads_ch = Channel.fromPath(params.fasta_input)
+            .map { file -> [file.baseName, file] }
+    }
 
-      DORADO_DEMULTIPLEX(DORADO_BASECALL.out.bam.map { it[1] }.collect())
+    // Assemble, polishing and assembly quality control
+    if (params.run_assembly) {
+        FILTLONG(barcoded_reads_ch)
+        FLYE(FILTLONG.out.reads)
+        read_assembly_ch = FLYE.out.assembly.join(barcoded_reads_ch)
+        MEDAKA(read_assembly_ch)
+        CHECKM2_DATABASEDOWNLOAD()
+        CHECKM2(MEDAKA.out.polished.map { it[1] }.collect(), CHECKM2_DATABASEDOWNLOAD.out.database)
+    }
 
-    barcoded_reads_ch = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
-        .map { file -> [file.baseName, file] }
+    // Taxonomic assignment
+    if (params.run_taxonomy) {
+        MMSEQS2_MAKEDB(params.mmseq2_db)
+        MMSEQS2_CLASSIFY(MMSEQS2_MAKEDB.out.mmseqs_db, MEDAKA.out.polished)
+        GTDB_TK_MAKEDB()
+        GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
+    }
 
-    PYCOQC(DORADO_DEMULTIPLEX.out.summary)
+    // Run RGI to identify ARGs
+    if (params.run_rgi) {
+        RGI(MEDAKA.out.polished)
+    }
 
-    FILTLONG(barcoded_reads_ch)
+    // Run Diamond (blastX) with whatever db you decide on
+    if (params.run_diamond) {
+        Channel
+            .fromPath(params.databases)
+            .map { file -> tuple(file.simpleName, file) }
+            .set { databases_ch }
 
-    FLYE(FILTLONG.out.reads)
-    
-    read_assemby_ch = FLYE.out.assembly.join(barcoded_reads_ch)
+        PRODIGAL(MEDAKA.out.polished)
+        DIAMOND_MAKEDB(databases_ch)
+        DIAMOND_BLASTP(PRODIGAL.out.coding_regions.combine(DIAMOND_MAKEDB.out.database))
+    }
 
-    MEDAKA(read_assemby_ch)
-
-    CHECKM2_DATABASEDOWNLOAD()
-    
-    CHECKM2(MEDAKA.out.polished.map { it[1] }.collect(), CHECKM2_DATABASEDOWNLOAD.out.database)
-
-    Channel
-        .fromPath(params.databases)
-        .map { file -> tuple(file.simpleName, file) }
-        .set { databases_ch }
-
-    PRODIGAL(MEDAKA.out.polished)  
-
-    DIAMOND_MAKEDB(databases_ch)
-    
-    DIAMOND_BLASTP(PRODIGAL.out.coding_regions.combine(DIAMOND_MAKEDB.out.database))
-
-    RGI(MEDAKA.out.polished)
-
-    MMSEQS2_MAKEDB(params.mmseq2_db)
-
-    MMSEQS2_CLASSIFY(
-        MMSEQS2_MAKEDB.out.mmseqs_db, MEDAKA.out.polished
-    )
-
-   GTDB_TK_MAKEDB()
-
-   GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
-
-   BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
-
+    BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
 }
