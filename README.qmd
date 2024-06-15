@@ -21,26 +21,11 @@ To start the pipeline execute this line ``NXF_VER=24.04.2 nextflow run main.nf -
 
 When running Nextflow on a SLURM-managed cluster, Nextflow submits its own jobs with the resources specified in the configuration file. Each process in the pipeline can have specific resource requirements (e.g., CPUs, time) defined in nextflow.config. Nextflow handles the job submission, management, and resource allocation automatically. 
 
-If you need to change the amout of resources allocated to each process just open the `nextflow.config` file and change the values.
-```groovy
-process {
-    withName:PRODIGAL {
-        cpus = 1 // nr CPUs
-        time = '1m' // max duration
-        container = "${projectDir}/Containers/apptainer.sif" // container
-        storeDir = "${params.storeDir}/Prodigal/" // where to store cache
-        publishDir = "${params.directory_out}/Prodigal/" // where to publish results
-        maxRetries = 3 // nr times it retried process if it fails
-    }
-
-}
-```
-
 If you need to submit jobs on a cluster like Vera using an SBATCH script, you can use a script like this:
 
 ```bash
 #!/usr/bin/env bash
-#SBATCH -A {PROJECT_NAME}  -p {CLUSTER_NAME} # Project name and Partition/queue name
+#SBATCH -A {PROJECT_NAME} -p {CLUSTER_NAME} # Project name and Partition/queue name
 #SBATCH -J {name}          # Job name
 #SBATCH -c 1               # Number of CPU cores. You do not need more than 1 here
 #SBATCH -t 24:00:00        # Maximum runtime
@@ -53,6 +38,21 @@ module load Nextflow
 
 # Start the pipeline with specific version of Nextflow
 NXF_VER=24.04.2 nextflow run main.nf -profile "cluster"
+```
+
+If you need to change the resources allocated to each process open the `nextflow.config` file and change the values.
+
+```groovy
+process {
+    withName:PRODIGAL {
+        cpus = 1 // nr CPUs
+        time = '1m' // max duration
+        container = "${projectDir}/Containers/apptainer.sif" // container
+        storeDir = "${params.storeDir}/Prodigal/" // where to store cache
+        publishDir = "${params.directory_out}/Prodigal/" // where to publish results
+    }
+
+}
 ```
 
 ## Workflow
@@ -130,20 +130,20 @@ graph TD
 
 ## Parameters
 
-The pipeline parameters are defined in the `config` file:
+The pipeline parameters are defined in the `config` file. You can either change each value on the command line like this `--input_files {VAL} --databases {PATH}
 
 ### Input/output 
 
-- `input_files`: Path to input Pod5 files, or basecalled fasta files, depending on which modules you want ot run.
-- `storeDir`: Directory to store intermediate files.
-- `directory_out`: Directory for final output.
-- `databases`: Path to custom databases for Diamond mapping.
+- `input_files`: Path to input Pod5 files, or basecalled fasta files, depending on which modules you want to run. Use glob patterns like this `{PATH}/*pod5`
+- `storeDir`: Directory to store intermediate files. ``./Store``
+- `directory_out`: Directory for final output. ``./Results``
+- `databases`: Path to protein fasta files. Can either be specified like this: `{PATH}/file.fasta`. Or if you have multiple files (can be as many as you like): `{PATH}/*.fasta`.
 
 ### Machine options
 
-- `clusterOptions`: Additional cluster options.
+- `clusterOptions`: Same as `-A {PROJECT_NAME} -p {CLUSTER_NAME}` in the SBATCH script of run in a cluster. Otherwise empty.
 - `DORADO_device`: Device for Dorado (e.g., "cpu", "gpu", "cuda:0", "all"). GPU is much faster and is therefore the preferred option if available. To choose that on Vera select "cuda:0". Otherwise it won't properly detect the GPUs.
-- `gpu_allocated`: If you want to run Dorado using a GPU you can specify which one here. IF you run the pipeline on the Vera cluster you write `--gpus-per-node=A40:1`. This will allocate one A40 GPU per process. 
+- `gpu_allocated`: If you want to run Dorado using a GPU you can specify which one here. If you run the pipeline on the Vera cluster you write `--gpus-per-node=V100:1`. This will allocate one V100 GPU per process. Dorado only works on  V100 and A100 GPUs.
 
 ### Process settings
 
@@ -163,14 +163,10 @@ The assembly related defaults are based on the valued identified by the authors 
 
 ### Which modules to tun
 
-To run a module enter `true`. To skip it enter `false`.
+To run a module enter `true`. To skip it enter `false`. You can see what module does what in the flow chart above. 
 
 - `Basecalling`: true
 - `Assembly `: true
 - `Taxonomy `: false
 - `ARG_Mapping`: true
 - `BLASTX`: false
-
-## Process Configuration
-
-The pipeline includes specific configurations for each process, such as CPU requirements, container images, and error handling strategies. For example:

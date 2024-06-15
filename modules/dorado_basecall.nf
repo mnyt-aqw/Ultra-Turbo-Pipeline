@@ -17,7 +17,5 @@ process DORADO_BASECALL {
     --trim none \
     --kit-name ${params.DORADO_kit} \
     > ${reads}.bam
-
-    
     """
 }
