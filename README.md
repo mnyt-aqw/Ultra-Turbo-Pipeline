@@ -25,7 +25,7 @@ git clone https://github.com/mnyt-aqw/Ultra-Turbo-Pipeline.git
 
 Most containers for this pipeline are publicly available on various
 container repositories. There is however one that you should build
-locally. Go to the `Container` directory and execute this command
+locally. Go to the `Container` directory and execute this command:
 
 ``` bash
 apptainer build apptainer.sif apptainer.def
@@ -180,16 +180,17 @@ file.
 
 ### Machine options
 
-- `clusterOptions`: Same as `-A {PROJECT_NAME} -p {CLUSTER_NAME}` in the
-  SBATCH script of run in a cluster. Otherwise empty.
-- `DORADO_device`: Device for Dorado (e.g., “cpu”, “gpu”, “cuda:0”,
-  “all”). GPU is much faster and is therefore the preferred option if
-  available. To choose that on Vera select “cuda:0”. Otherwise it won’t
-  properly detect the GPUs.
-- `gpu_allocated`: If you want to run Dorado using a GPU you can specify
-  which one here. If you run the pipeline on the Vera cluster you write
-  `--gpus-per-node=V100:1`. This will allocate one V100 GPU per process.
-  Dorado only works on V100 and A100 GPUs.
+- `clusterOptions`: Specifies additional cluster options, similar to the
+  options used in an SBATCH script. For example, use
+  `-A {PROJECT_NAME} -p {CLUSTER_NAME}` when running on a cluster. Leave
+  this empty if not applicable.
+- `DORADO_device`: Specifies the device for running Dorado (e.g., “cpu”,
+  “gpu”, “cuda:0”, “all”). Using a GPU is highly recommended as it
+  significantly speeds up the process. For the Vera cluster, specify
+  “cuda:0” to ensure proper GPU detection.
+- `gpu_allocated`: Specifies the GPU allocation for running Dorado. For
+  the Vera cluster, use `--gpus-per-node=V100:1` to allocate one V100
+  GPU per process. Note that Dorado only supports V100 and A100 GPUs.
 
 ### Process settings
 
