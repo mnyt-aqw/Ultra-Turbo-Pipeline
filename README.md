@@ -26,13 +26,19 @@ git clone https://github.com/mnyt-aqw/Ultra-Turbo-Pipeline.git
 Most containers for this pipeline are publicly available on various
 container repositories. There is however one that you should build
 locally. Go to the `Container` directory and execute this command
-`apptainer build apptainer.sif apptainer.def`. The pipeline will
-automatically find this container.
+
+``` bash
+apptainer build apptainer.sif apptainer.def
+```
 
 ### Start pipeline
 
 To start the pipeline execute this line
-`NXF_VER=24.04.2 nextflow run main.nf --profile {server or cluster} {other args}`.
+
+``` bash
+NXF_VER=24.04.2 nextflow run main.nf --profile {server or cluster} {other args}
+```
+
 This will download a specific version of Nextflow and you will have to
 specify if you run the pipeline on a `server` or `cluster`. If you want
 to resume the pipeline use the `-resume` flag. The pipeline will then
@@ -51,11 +57,11 @@ script, you can use a script like this:
 
 ``` bash
 #!/usr/bin/env bash
-#SBATCH -A {PROJECT_NAME} -p {CLUSTER_NAME} # Project name and Partition/queue name
-#SBATCH -J {name}          # Job name
-#SBATCH -c 1               # Number of CPU cores. You do not need more than 1 here
-#SBATCH -t 24:00:00        # Maximum runtime
-#SBATCH --error={PATH}/job.%J.err  # Path to the error file
+#SBATCH -A C3SE2021-2-3 -p vera     # Add YOUR Project name and Partition/queue name.
+#SBATCH -J {name}                   # Job name
+#SBATCH -c 1                        # Number of CPU cores. You do not need more than 1 here
+#SBATCH -t 24:00:00                 # Maximum runtime
+#SBATCH --error={PATH}/job.%J.err   # Path to the error file
 #SBATCH --output={PATH}/job.%J.out  # Path to the output file
 
 # Unload unwanted packages and load Nextflow
@@ -157,8 +163,9 @@ graph TD
 ## Parameters
 
 The pipeline parameters are defined in the `config` file. You can either
-change each value on the command line like this \`–input_files {VAL}
-–databases {PATH}
+change each value on the command line like this
+`--input_files {VAL} --databases {PATH}. Or by changing the values in the`nextflow.config\`
+file.
 
 ### Input/output
 
