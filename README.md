@@ -11,6 +11,16 @@ supports Conda and Apptainer environments for software dependencies.
 
 ## How to run the pipeline
 
+### Fetch the pipeline
+
+The easiest way to downland the pipeline is to clone this github repo to
+a local directory on a local machine, cluster, or server like the
+example below.
+
+``` bash
+git clone https://github.com/mnyt-aqw/Ultra-Turbo-Pipeline.git
+```
+
 ### Build container
 
 Most containers for this pipeline are publicly available on various
