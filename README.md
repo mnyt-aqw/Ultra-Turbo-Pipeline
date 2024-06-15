@@ -16,15 +16,16 @@ supports Conda and Apptainer environments for software dependencies.
 Most containers for this pipeline are publicly available on various
 container repositories. There is however one that you should build
 locally. Go to the `Container` directory and execute this command
-`apptainer build apptainer.sif apptainer.def`.
+`apptainer build apptainer.sif apptainer.def`. The pipeline will
+automatically find this container.
 
 ### Start pipeline
 
 To start the pipeline execute this line
 `NXF_VER=24.04.2 nextflow run main.nf --profile {server or cluster} {other args}`.
 This will download a specific version of Nextflow and you will have to
-specify if you run the pipeline on a `server` or `cluster`. If yo want
-to resume the pipeline use the `-resume` flag. Then the pipeline will
+specify if you run the pipeline on a `server` or `cluster`. If you want
+to resume the pipeline use the `-resume` flag. The pipeline will then
 ignore processes it already have finished.
 
 #### SLURM
@@ -67,7 +68,6 @@ process {
         storeDir = "${params.storeDir}/Prodigal/" // where to store cache
         publishDir = "${params.directory_out}/Prodigal/" // where to publish results
     }
-
 }
 ```
 
