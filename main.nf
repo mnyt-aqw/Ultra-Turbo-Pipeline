@@ -48,7 +48,7 @@ workflow {
         .set { read_ch }
 
     // Run basecalling
-    if (params.run_basecalling) {
+    if (params.Basecalling) {
         DORADO_BASECALL(read_ch)
         DORADO_DEMULTIPLEX(DORADO_BASECALL.out.bam.map { it[1] }.collect())
         barcoded_reads_ch = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
@@ -60,7 +60,7 @@ workflow {
     }
 
     // Assemble, polishing and assembly quality control
-    if (params.run_assembly) {
+    if (params.Assembly) {
         FILTLONG(barcoded_reads_ch)
         FLYE(FILTLONG.out.reads)
         read_assembly_ch = FLYE.out.assembly.join(barcoded_reads_ch)
@@ -70,7 +70,7 @@ workflow {
     }
 
     // Taxonomic assignment
-    if (params.run_taxonomy) {
+    if (params.Taxonomy) {
         MMSEQS2_MAKEDB(params.mmseq2_db)
         MMSEQS2_CLASSIFY(MMSEQS2_MAKEDB.out.mmseqs_db, MEDAKA.out.polished)
         GTDB_TK_MAKEDB()
@@ -78,12 +78,12 @@ workflow {
     }
 
     // Run RGI to identify ARGs
-    if (params.run_rgi) {
+    if (params.ARG_Mapping) {
         RGI(MEDAKA.out.polished)
     }
 
     // Run Diamond (blastX) with whatever db you decide on
-    if (params.run_diamond) {
+    if (params.BLASTX) {
         Channel
             .fromPath(params.databases)
             .map { file -> tuple(file.simpleName, file) }
@@ -94,5 +94,5 @@ workflow {
         DIAMOND_BLASTP(PRODIGAL.out.coding_regions.combine(DIAMOND_MAKEDB.out.database))
     }
 
-    BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
+   // BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
 }
