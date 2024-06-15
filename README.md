@@ -13,7 +13,7 @@ supports Conda and Apptainer environments for software dependencies.
 
 ### Fetch the pipeline
 
-The easiest way to downland the pipeline is to clone this github repo to
+The easiest way to download the pipeline is to clone this GitHub repo to
 a local directory on a local machine, cluster, or server like the
 example below.
 
@@ -33,16 +33,16 @@ apptainer build apptainer.sif apptainer.def
 
 ### Start pipeline
 
-To start the pipeline execute this line
+To start the pipeline, execute this line:
 
 ``` bash
 NXF_VER=24.04.2 nextflow run main.nf --profile {server or cluster} {other args}
 ```
 
-This will download a specific version of Nextflow and you will have to
-specify if you run the pipeline on a `server` or `cluster`. If you want
-to resume the pipeline use the `-resume` flag. The pipeline will then
-ignore processes it already have finished.
+This will download a specific version of Nextflow, and you will have to
+specify if you run the pipeline on a server or cluster. If you want to
+resume the pipeline, use the `-resume`flag. The pipeline will then
+ignore processes it has already finished.
 
 #### SLURM
 
@@ -72,7 +72,7 @@ module load Nextflow
 NXF_VER=24.04.2 nextflow run main.nf -profile "cluster"
 ```
 
-If you need to change the resources allocated to each process open the
+If you need to change the resources allocated to each process, open the
 `nextflow.config` file and change the values.
 
 ``` groovy
