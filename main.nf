@@ -44,7 +44,7 @@ include { MMSEQS2_CLASSIFY } from './modules/mmseqs2'
 // Main workflow
 workflow {
     Channel
-        .fromFilePairs(params.reads, size: 1)
+        .fromFilePairs(params.input_files, size: 1)
         .set { read_ch }
 
     // Run basecalling
@@ -54,14 +54,14 @@ workflow {
         barcoded_reads_ch = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
             .map { file -> [file.baseName, file] }
         PYCOQC(DORADO_DEMULTIPLEX.out.summary)
+        FILTLONG(barcoded_reads_ch)
     } else {
-        barcoded_reads_ch = Channel.fromPath(params.fasta_input)
+        barcoded_reads_ch = Channel.fromPath(params.input_files)
             .map { file -> [file.baseName, file] }
     }
 
     // Assemble, polishing and assembly quality control
     if (params.Assembly) {
-        FILTLONG(barcoded_reads_ch)
         FLYE(FILTLONG.out.reads)
         read_assembly_ch = FLYE.out.assembly.join(barcoded_reads_ch)
         MEDAKA(read_assembly_ch)

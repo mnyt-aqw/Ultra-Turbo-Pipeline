@@ -13,11 +13,11 @@ process DORADO_BASECALL {
     dorado basecaller \
     ${params.DORADO_model} \
     ${reads} \
-    --device cuda:0 \
+    --device ${params.DORADO_device} \
     --trim none \
     --kit-name ${params.DORADO_kit} \
     > ${reads}.bam
 
-    # --device ${params.DORADO_device} \
+    
     """
 }
