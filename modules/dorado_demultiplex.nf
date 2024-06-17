@@ -19,7 +19,6 @@ process DORADO_DEMULTIPLEX {
     --output-dir demultiplexed/ \
     merged.bam
 
- 
     dorado summary merged.bam  > dorado_summary.tsv
 
     for bam_file in demultiplexed/*.bam; do
