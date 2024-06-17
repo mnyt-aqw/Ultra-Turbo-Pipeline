@@ -11,6 +11,7 @@ include { DORADO_DEMULTIPLEX } from './modules/dorado_demultiplex'
 
 // Filtering and quality control
 include { FILTLONG } from './modules/filtlong'
+include { COUNT_FASTQ_ENTRIES } from './modules/filter_fastq'
 
 // Visualize quality metrics
 include { PYCOQC } from './modules/pycoQC'
@@ -51,10 +52,13 @@ workflow {
     if (params.Basecalling) {
         DORADO_BASECALL(read_ch)
         DORADO_DEMULTIPLEX(DORADO_BASECALL.out.bam.map { it[1] }.collect())
-        barcoded_reads_ch = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
+        barcoded = DORADO_DEMULTIPLEX.out.barcoded_reads.flatten()
             .map { file -> [file.baseName, file] }
         PYCOQC(DORADO_DEMULTIPLEX.out.summary)
-        FILTLONG(barcoded_reads_ch)
+        FILTLONG(barcoded)
+        COUNT_FASTQ_ENTRIES(FILTLONG.out.reads.map { it[1] }.collect())
+        barcoded_reads_ch = COUNT_FASTQ_ENTRIES.out.pass_reads.flatten()
+            .map { file -> [file.baseName, file] }
     } else {
         barcoded_reads_ch = Channel.fromPath(params.input_files)
             .map { file -> [file.baseName, file] }
@@ -62,7 +66,7 @@ workflow {
 
     // Assemble, polishing and assembly quality control
     if (params.Assembly) {
-        FLYE(FILTLONG.out.reads)
+        FLYE(barcoded_reads_ch)
         read_assembly_ch = FLYE.out.assembly.join(barcoded_reads_ch)
         MEDAKA(read_assembly_ch)
         CHECKM2_DATABASEDOWNLOAD()
