@@ -56,9 +56,7 @@ workflow {
             .map { file -> [file.baseName, file] }
         PYCOQC(DORADO_DEMULTIPLEX.out.summary)
         FILTLONG(barcoded)
-        COUNT_FASTQ_ENTRIES(FILTLONG.out.reads.map { it[1] }.collect())
-        barcoded_reads_ch = COUNT_FASTQ_ENTRIES.out.pass_reads.flatten()
-            .map { file -> [file.baseName, file] }
+        barcoded_reads_ch = FILTLONG.out.reads
     } else {
         barcoded_reads_ch = Channel.fromPath(params.input_files)
             .map { file -> [file.baseName, file] }
@@ -71,14 +69,16 @@ workflow {
         MEDAKA(read_assembly_ch)
         CHECKM2_DATABASEDOWNLOAD()
         CHECKM2(MEDAKA.out.polished.map { it[1] }.collect(), CHECKM2_DATABASEDOWNLOAD.out.database)
+        // BUSCO is not finished yet
+        // BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
     }
 
     // Taxonomic assignment
     if (params.Taxonomy) {
         MMSEQS2_MAKEDB(params.mmseq2_db)
         MMSEQS2_CLASSIFY(MMSEQS2_MAKEDB.out.mmseqs_db, MEDAKA.out.polished)
-       // GTDB_TK_MAKEDB()
-       // GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
+        GTDB_TK_MAKEDB()
+        GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
         GTDB_TK(params.path_gtdb_tk_db, MEDAKA.out.polished.map { it[1] }.collect())
     }
 
@@ -99,5 +99,4 @@ workflow {
         DIAMOND_BLASTP(PRODIGAL.out.coding_regions.combine(DIAMOND_MAKEDB.out.database))
     }
 
-   // BUSCO(MEDAKA.out.polished.map { it[1] }.collect())
 }
