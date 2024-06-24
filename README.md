@@ -27,7 +27,8 @@ This script builds a custom container from the provided definition file
 and pulls pre-built containers for all other tools used in the pipeline.
 
 ``` bash
-bash  Containers/containers.sh
+cd Containers/
+bash containers.sh
 ```
 
 ### Prerequisits
