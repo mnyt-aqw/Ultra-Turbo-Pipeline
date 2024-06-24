@@ -11,7 +11,6 @@ include { DORADO_DEMULTIPLEX } from './modules/dorado_demultiplex'
 
 // Filtering and quality control
 include { FILTLONG } from './modules/filtlong'
-include { COUNT_FASTQ_ENTRIES } from './modules/filter_fastq'
 
 // Visualize quality metrics
 include { PYCOQC } from './modules/pycoQC'
