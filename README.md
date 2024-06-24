@@ -174,16 +174,11 @@ change each value on the command line like this
 `--input_files {VAL} --databases {PATH}. Or by changing the values in the`nextflow.config\`
 file.
 
-<div>
-
-> **Note**
->
+> \[!NOTE\]  
 > When ypu specify paths to files you can either use full paths. Or you
 > can use relative paths. But instead us specifying `"../../db/*.gz"`.
 > You do it like this `"${projectDir}/../../db/*.gz"`. If you do that do
-> **not** use single quotes `'`, use doable `"`.
-
-</div>
+> **not** use single quotes `'`, use double `"`.
 
 ### Mandatory
 
@@ -227,15 +222,10 @@ module does what in the flow chart above.
 - `ARG_Mapping`: true
 - `BLASTX`: false
 
-<div>
-
-> **Warning**
->
+> \[!IMPORTANT\]  
 > `Taxonomy` currently does not work on Vera due to the limited tmp dir
 > spaces. This will be fixed after summer. If you want to run `Taxonomy`
 > you will have to do that on the server.
-
-</div>
 
 ### Settings with predefined defaults
 

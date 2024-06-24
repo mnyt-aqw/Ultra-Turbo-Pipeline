@@ -154,9 +154,9 @@ graph TD
 
 The pipeline parameters are defined in the `config` file. You can either change each value on the command line like this `--input_files {VAL} --databases {PATH}. Or by changing the values in the `nextflow.config` file. 
 
-::: {.callout-note}
-When ypu specify paths to files you can either use full paths. Or you can use relative paths. But instead us specifying ``"../../db/*.gz"``. You do it like this ``"${projectDir}/../../db/*.gz"``. If you do that do **not** use single quotes `'`, use doable `"`. 
-:::
+> [!NOTE]  
+> When ypu specify paths to files you can either use full paths. Or you can use relative paths. But instead us specifying ``"../../db/*.gz"``. You do it like this ``"${projectDir}/../../db/*.gz"``. If you do that do **not** use single quotes `'`, use double `"`. 
+
 
 ### Mandatory
 
@@ -185,9 +185,8 @@ To run a module enter `true`. To skip it enter `false`. You can see what module 
 - `ARG_Mapping`: true
 - `BLASTX`: false
 
-::: {.callout-warning}
-`Taxonomy` currently does not work on Vera due to the limited tmp dir spaces. This will be fixed after summer. If you want to run `Taxonomy` you will have to do that on the server. 
-:::
+> [!IMPORTANT]  
+> `Taxonomy` currently does not work on Vera due to the limited tmp dir spaces. This will be fixed after summer. If you want to run `Taxonomy` you will have to do that on the server. 
 
 ### Settings with predefined defaults 
 
