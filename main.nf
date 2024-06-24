@@ -77,8 +77,9 @@ workflow {
     if (params.Taxonomy) {
         MMSEQS2_MAKEDB(params.mmseq2_db)
         MMSEQS2_CLASSIFY(MMSEQS2_MAKEDB.out.mmseqs_db, MEDAKA.out.polished)
-        GTDB_TK_MAKEDB()
-        GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
+       // GTDB_TK_MAKEDB()
+       // GTDB_TK(GTDB_TK_MAKEDB.out.db_files, MEDAKA.out.polished.map { it[1] }.collect())
+        GTDB_TK(params.path_gtdb_tk_db, MEDAKA.out.polished.map { it[1] }.collect())
     }
 
     // Run RGI to identify ARGs
