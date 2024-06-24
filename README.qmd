@@ -19,16 +19,16 @@ git clone https://github.com/mnyt-aqw/Ultra-Turbo-Pipeline.git
 
 ### Download containers
 
-This script builds a custom container from the provided definition file and pulls pre-built containers for all other tools used in the pipeline.
+This script builds a custom container from the provided definition file and pulls pre-built containers for all other tools used in the pipeline. It will take roughly 20 minutes to run.
 
 ```bash
 cd Containers/
 bash containers.sh
 ```
 
-### Prerequisits
+### Prerequisites
 
-The only prerequisits you need to run this pipeline are `Apptainer`/`Docker`, and `Nextflow`. The pipeline will install everything else by it self. 
+The only prerequisite you need to run this pipeline are `Apptainer`/`Docker`, and `Nextflow`. The pipeline will install everything else by it self. 
 
 ### Start pipeline
 
@@ -155,7 +155,7 @@ graph TD
 The pipeline parameters are defined in the `config` file. You can either change each value on the command line like this `--input_files {VAL} --databases {PATH}. Or by changing the values in the `nextflow.config` file. 
 
 ::: {.callout-note}
-When ypu specify paths to files you can either use full paths. Or you can use reltive paths. But instead us specifying ``"../../db/*.gz"``. You do it like this ``"${projectDir}/../../db/*.gz"``. If you od that do **not** use singel quotes `'`, use doubble `"`. 
+When ypu specify paths to files you can either use full paths. Or you can use relative paths. But instead us specifying ``"../../db/*.gz"``. You do it like this ``"${projectDir}/../../db/*.gz"``. If you do that do **not** use single quotes `'`, use doable `"`. 
 :::
 
 ### Mandatory
@@ -185,7 +185,11 @@ To run a module enter `true`. To skip it enter `false`. You can see what module 
 - `ARG_Mapping`: true
 - `BLASTX`: false
 
-### Settings wiht predefined defaults 
+::: {.callout-warning}
+`Taxonomy` currently does not work on Vera due to the limited tmp dir spaces. This will be fixed after summer. If you want to run `Taxonomy` you will have to do that on the server. 
+:::
+
+### Settings with predefined defaults 
 
 #### Input/output 
 

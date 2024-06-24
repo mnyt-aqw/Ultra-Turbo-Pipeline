@@ -25,15 +25,16 @@ git clone https://github.com/mnyt-aqw/Ultra-Turbo-Pipeline.git
 
 This script builds a custom container from the provided definition file
 and pulls pre-built containers for all other tools used in the pipeline.
+It will take roughly 20 minutes to run.
 
 ``` bash
 cd Containers/
 bash containers.sh
 ```
 
-### Prerequisits
+### Prerequisites
 
-The only prerequisits you need to run this pipeline are
+The only prerequisite you need to run this pipeline are
 `Apptainer`/`Docker`, and `Nextflow`. The pipeline will install
 everything else by it self.
 
@@ -178,9 +179,9 @@ file.
 > **Note**
 >
 > When ypu specify paths to files you can either use full paths. Or you
-> can use reltive paths. But instead us specifying `"../../db/*.gz"`.
-> You do it like this `"${projectDir}/../../db/*.gz"`. If you od that do
-> **not** use singel quotes `'`, use doubble `"`.
+> can use relative paths. But instead us specifying `"../../db/*.gz"`.
+> You do it like this `"${projectDir}/../../db/*.gz"`. If you do that do
+> **not** use single quotes `'`, use doable `"`.
 
 </div>
 
@@ -226,7 +227,17 @@ module does what in the flow chart above.
 - `ARG_Mapping`: true
 - `BLASTX`: false
 
-### Settings wiht predefined defaults
+<div>
+
+> **Warning**
+>
+> `Taxonomy` currently does not work on Vera due to the limited tmp dir
+> spaces. This will be fixed after summer. If you want to run `Taxonomy`
+> you will have to do that on the server.
+
+</div>
+
+### Settings with predefined defaults
 
 #### Input/output
 
