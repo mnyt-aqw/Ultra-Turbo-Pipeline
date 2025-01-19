@@ -18,7 +18,8 @@ process FLYE {
         --nano-hq \
         ${reads} \
         --out-dir . \
-        --threads $task.cpus 
+        --threads $task.cpus \
+        --meta
         
         
 
