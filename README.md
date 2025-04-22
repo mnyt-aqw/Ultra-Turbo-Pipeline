@@ -312,3 +312,9 @@ GTDB - gtdbtk.log: Log file of the GTDB-Tk run
 
 mmseqs2/: - \*\_taxonomy_lca.tsv: Taxonomic classification of contigs
 using LCA algorithm
+
+## Future additions
+
+* Host associated read removal (remove human DNA contamination).
+* Add metagenomic flag for assemby using the meta flag, as well as binning using SemiBin2.
+* Make taxonomic annotation work on HPCs.
