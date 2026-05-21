@@ -1,6 +1,5 @@
 // Dorado basecalling
 process DORADO_DEMULTIPLEX {
-    tag "$sample"
 
     input:
     path bam 
