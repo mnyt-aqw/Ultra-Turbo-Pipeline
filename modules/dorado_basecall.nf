@@ -1,6 +1,5 @@
 // Dorado basecalling
 process DORADO_BASECALL {
-    tag "$sample"
 
     input:
     tuple val(sample), path(reads)
