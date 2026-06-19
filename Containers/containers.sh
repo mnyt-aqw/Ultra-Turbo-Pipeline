@@ -16,6 +16,7 @@ containers=(
     ["MMseqs2"]="quay.io/biocontainers/mmseqs2:15.6f452--pl5321h6a68c12_2"
     ["RGI"]="quay.io/biocontainers/rgi:6.0.3--pyha8f3691_1"
     ["Biopython"]="quay.io/biocontainers/biopython:1.79"
+    ["SemiBin2"]="quay.io/biocontainers/semibin:2.1.0--pyhdfd78af_0"
 )
 
 # Pull each container and save it with the specified name
